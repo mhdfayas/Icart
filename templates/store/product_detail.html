@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - iCart{% endblock %}
+
+{% block content %}
+
+<style>
+    .product-thumbnails .thumbnail-image {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    height: 80px;
+    object-fit: cover;
+}
+
+.product-thumbnails .thumbnail-image.active {
+    opacity: 1;
+    border: 2px solid #007bff;
+}
+
+.product-thumbnails .thumbnail-image:hover {
+    opacity: 0.9;
+}
+</style>
+
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'product_list_by_category' product.category.slug %}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+    <!-- Product Image -->
+<div class="col-md-6 mb-4">
+    <div class="card border-0">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top rounded" id="main-product-image" style="object-fit: cover; max-height: 600px;">
+        {% else %}
+            <img src="/api/placeholder/600/500" alt="{{ product.name }}" class="card-img-top rounded" id="main-product-image">
+        {% endif %}
+        <div class="card-body p-0 mt-3">
+            <div class="row product-thumbnails">
+                <!-- Main image thumbnail -->
+                {% if product.image %}
+                <div class="col-3">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail thumbnail-image active" data-src="{{ product.image.url }}">
+                </div>
+                {% endif %}
+                
+                <!-- Additional image thumbnails -->
+                {% for image in product.images.all %}
+                    {% if not image.is_primary %}
+                    <div class="col-3">
+                        <img src="{{ image.image.url }}" alt="{{ product.name }} view {{ forloop.counter }}" class="img-thumbnail thumbnail-image" data-src="{{ image.image.url }}">
+                    </div>
+                    {% endif %}
+                {% empty %}
+                    <!-- Display placeholder thumbnails if no additional images -->
+                    {% if not product.image %}
+                    <div class="col-3">
+                        <img src="/api/placeholder/150/150" alt="{{ product.name }}" class="img-thumbnail thumbnail-image active" data-src="/api/placeholder/600/500">
+                    </div>
+                    {% endif %}
+                    <div class="col-3">
+                        <img src="/api/placeholder/150/150" alt="Product view 2" class="img-thumbnail thumbnail-image">
+                    </div>
+                    <div class="col-3">
+                        <img src="/api/placeholder/150/150" alt="Product view 3" class="img-thumbnail thumbnail-image">
+                    </div>
+                    <div class="col-3">
+                        <img src="/api/placeholder/150/150" alt="Product view 4" class="img-thumbnail thumbnail-image">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% block extra_js %}
+<script>
+    // Thumbnail click handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const thumbnails = document.querySelectorAll('.thumbnail-image');
+        const mainImage = document.getElementById('main-product-image');
+        
+        thumbnails.forEach(function(thumbnail) {
+            thumbnail.addEventListener('click', function() {
+                // Remove active class from all thumbnails
+                thumbnails.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked thumbnail
+                this.classList.add('active');
+                
+                // Update main image src if data-src is available
+                const imageSrc = this.getAttribute('data-src');
+                if (imageSrc) {
+                    mainImage.src = imageSrc;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h1 class="h2 mb-3">{{ product.name }}</h1>
+            
+            <div class="mb-3">
+                <span class="me-2">
+                    {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= avg_rating|floatformat:"0" %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% elif forloop.counter <= avg_rating|add:"0.5"|floatformat:"0" %}
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-warning"></i>
+                        {% endif %}
+                    {% endfor %}
+                </span>
+                <span class="text-muted">({{ avg_rating|floatformat:"1" }}/5 - {{ review_count }} reviews)</span>
+            </div>
+            
+            <h2 class="price mb-4">₹{{ product.price }}</h2>
+            
+            <div class="mb-4">
+                {% if product.stock > 0 %}
+                    <span class="badge bg-success">In Stock ({{ product.stock }} available)</span>
+                {% else %}
+                    <span class="badge bg-danger">Out of Stock</span>
+                {% endif %}
+            </div>
+            
+            <div class="mb-4">
+                <h5>Description</h5>
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+            
+            {% if product.stock > 0 %}
+                <form action="{% url 'add_to_cart' product.id %}" method="post" class="mb-4">
+                    {% csrf_token %}
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="quantity" class="col-form-label">Quantity:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-select" id="quantity" name="quantity">
+                                {% for i in "12345"|make_list %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            {% endif %}
+            
+            
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-truck-fast fa-2x text-muted"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Free Delivery</h6>
+                            <p class="text-muted mb-0">Free delivery on all orders</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-undo fa-2x text-muted"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">30 Days Return</h6>
+                            <p class="text-muted mb-0">If goods have problems, we accept 30 days return</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-shield-alt fa-2x text-muted"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Secure Payment</h6>
+                            <p class="text-muted mb-0">100% secure payment with encryption</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Tabs -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <!-- Display messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Specifications</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews ({{ review_count }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab">Shipping Info</button>
+                </li>
+            </ul>
+            <div class="tab-content p-4 border border-top-0 rounded-bottom" id="productTabsContent">
+                <div class="tab-pane fade show active" id="specs" role="tabpanel">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <th scope="row" style="width: 30%;">Brand</th>
+                                <td>iCart Official</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Category</th>
+                                <td>{{ product.category.name }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">SKU</th>
+                                <td>IC-{{ product.id }}-{{ product.slug|truncatechars:5 }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Availability</th>
+                                <td>{{ product.stock }} in stock</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Added on</th>
+                                <td>{{ product.created|date:"F d, Y" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    <div class="mb-4">
+                        <h5 class="mb-3">Customer Reviews</h5>
+                        {% if reviews %}
+                            {% for review in reviews %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <h6 class="card-title mb-0">{{ review.user.get_full_name|default:review.user.username }}</h6>
+                                            <div>
+                                                {% for i in "12345"|make_list %}
+                                                    {% if forloop.counter <= review.rating %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <p class="text-muted small">Posted on: {{ review.created_at|date:"F d, Y" }}</p>
+                                        <p class="card-text">{{ review.comment }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-info">
+                                <p class="mb-0">No reviews yet. Be the first to review this product!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <h5 class="mb-3">Write a Review</h5>
+                        {% if user.is_authenticated %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="id_rating" class="form-label">Your Rating</label>
+                                    {{ review_form.rating }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="id_comment" class="form-label">Your Review</label>
+                                    {{ review_form.comment }}
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <p class="mb-0">Please <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">login</a> to write a review.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="shipping" role="tabpanel">
+                    <h5 class="mb-3">Shipping Information</h5>
+                    <p>We offer the following shipping options:</p>
+                    <ul>
+                        <li><strong>Standard Shipping:</strong> 3-5 business days (₹59)</li>
+                        <li><strong>Express Shipping:</strong> 1-2 business days (₹99)</li>
+                        <li><strong>Free Shipping:</strong> On all orders over ₹500 (5-7 business days)</li>
+                    </ul>
+                    <p>Please note that shipping times may vary based on your location and other factors.</p>
+                    
+                    <h5 class="mb-3 mt-4">Return Policy</h5>
+                    <p>We accept returns within 30 days of delivery for most items. To be eligible for a return, your item must be unused and in the same condition that you received it. It must also be in the original packaging.</p>
+                    <p>To start a return, contact our customer service team at returns@icart.com with your order number and details about the item you wish to return.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   <!-- Related Products -->
+<section class="mt-5">
+    <h3 class="section-title mb-4">Related Products</h3>
+    <div class="row">
+        {% if related_products %}
+            {% for related_product in related_products %}
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card h-100 animated-card">
+                        {% if related_product.image %}
+                            <img src="{{ related_product.image.url }}" alt="{{ related_product.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <img src="/api/placeholder/300/200" alt="{{ related_product.name }}" class="card-img-top">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title text-truncate">{{ related_product.name }}</h5>
+                            <p class="price mb-2">₹{{ related_product.price }}</p>
+                            <a href="{% url 'product_detail' related_product.slug %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No related products found.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+</div>
+
+{% if request.GET.tab == 'reviews' or messages %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('reviews-tab').click();
+    });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 p-0">
+            <div class="admin-sidebar py-4">
+                <div class="px-3 mb-4">
+                    <h4 class="text-light"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</h4>
+                </div>
+                <a href="{% url 'admin_dashboard' %}" class="active">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'admin_product_list' %}">
+                    <i class="fas fa-box me-2"></i> Products
+                </a>
+                <a href="{% url 'admin_category_list' %}">
+                    <i class="fas fa-tags me-2"></i> Categories
+                </a>
+                <a href="{% url 'admin_order_list' %}">
+                    <i class="fas fa-shopping-bag me-2"></i> Orders
+                </a>
+                <a href="{% url 'admin_user_list' %}">
+                    <i class="fas fa-users me-2"></i> Users
+                </a>
+                <a href="{% url 'home' %}">
+                    <i class="fas fa-store me-2"></i> View Store
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 p-4 bg-light">
+            <h2 class="mb-4">Dashboard Overview</h2>
+            
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-white h-100" style="background-color: var(--red);">
+                        <a href="{% url 'admin_product_list' %}" class="card-body" style="text-decoration: none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">Total Products</h6>
+                                    <h2 class="mb-0">{{ total_products }}</h2>
+                                </div>
+                                <i class="fas fa-box fa-3x opacity-50"></i>
+                            </div>
+                        </a>
+                        <a href="{% url 'admin_product_list' %}" class="card-footer d-flex align-items-center justify-content-between" style="text-decoration: none; background-color: rgba(0,0,0,0.1);">
+                            <div class="text-white text-decoration-none small">View Details</div>
+                            <i class="fas fa-angle-right text-white"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-white h-100" style="background-color: var(--salmon);">
+                        <a href="{% url 'admin_order_list' %}" class="card-body" style="text-decoration: none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">Total Orders</h6>
+                                    <h2 class="mb-0">{{ total_orders }}</h2>
+                                </div>
+                                <i class="fas fa-shopping-cart fa-3x opacity-50"></i>
+                            </div>
+                        </a>
+                        <a href="{% url 'admin_order_list' %}" class="card-footer d-flex align-items-center justify-content-between" style="text-decoration: none; background-color: rgba(0,0,0,0.1);text-decoration: none;">
+                            <div class="text-white text-decoration-none small">View Details</div>
+                            <i class="fas fa-angle-right text-white"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-dark h-100" style="background-color: var(--cream);">
+                        <a href="{% url 'admin_order_list' %}" class="card-body" style="text-decoration: none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">Pending Orders</h6>
+                                    <h2 class="mb-0">{{ pending_orders }}</h2>
+                                </div>
+                                <i class="fas fa-clock fa-3x opacity-50"></i>
+                            </div>
+                        </a>
+                        <a href="{% url 'admin_order_list' %}" class="card-footer d-flex align-items-center justify-content-between" style="text-decoration: none; background-color: rgba(0,0,0,0.1);">
+                            <div class="text-dark text-decoration-none small">View Details</div>
+                            <i class="fas fa-angle-right text-dark"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-dark h-100" style="background-color: var(--light-green);">
+                        <a href="{% url 'admin_user_list' %}" class="card-body" style="text-decoration: none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">Total Users</h6>
+                                    <h2 class="mb-0">{{ total_users }}</h2>
+                                </div>
+                                <i class="fas fa-users fa-3x opacity-50"></i>
+                            </div>
+                        </a>
+                        <a href="{% url 'admin_user_list' %}" class="card-footer d-flex align-items-center justify-content-between" style="text-decoration: none; background-color: rgba(0,0,0,0.1);">
+                            <div class="text-dark text-decoration-none small">View Details</div>
+                            <i class="fas fa-angle-right text-dark"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header" style="background-color: var(--light-green);">
+                            <h5 class="mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <a href="{% url 'admin_add_product' %}" class="d-block p-3 text-center text-decoration-none border rounded animated-card">
+                                        <i class="fas fa-plus-circle fa-2x mb-2" style="color: var(--red);"></i>
+                                        <p class="mb-0">Add Product</p>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="{% url 'admin_add_category' %}" class="d-block p-3 text-center text-decoration-none border rounded animated-card">
+                                        <i class="fas fa-folder-plus fa-2x mb-2" style="color: var(--red);"></i>
+                                        <p class="mb-0">Add Category</p>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="{% url 'admin_order_list' %}" class="d-block p-3 text-center text-decoration-none border rounded animated-card">
+                                        <i class="fas fa-clipboard-list fa-2x mb-2" style="color: var(--red);"></i>
+                                        <p class="mb-0">Manage Orders</p>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="{% url 'admin_user_list' %}" class="d-block p-3 text-center text-decoration-none border rounded animated-card">
+                                        <i class="fas fa-user-cog fa-2x mb-2" style="color: var(--red);"></i>
+                                        <p class="mb-0">Manage Users</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Orders -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header" style="background-color: var(--salmon);">
+                            <h5 class="mb-0 text-white">Recent Orders</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Status</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in recent_orders|slice:":5" %}
+                                            <tr>
+                                                <td>#{{ order.id }}</td>
+                                                <td>{{ order.user.username }}</td>
+                                                <td>
+                                                    {% if order.status == 'pending' %}
+                                                        <span class="badge bg-warning text-dark">Pending</span>
+                                                    {% elif order.status == 'processing' %}
+                                                        <span class="badge bg-info">Processing</span>
+                                                    {% elif order.status == 'shipped' %}
+                                                        <span class="badge bg-primary">Shipped</span>
+                                                    {% elif order.status == 'delivered' %}
+                                                        <span class="badge bg-success">Delivered</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Cancelled</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>${{ order.total_price }}</td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="4" class="text-center">No recent orders</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-end">
+                                <a href="{% url 'admin_order_list' %}" class="btn btn-sm btn-outline-primary">View All Orders</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Low Stock Alert -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header" style="background-color: var(--red); color: white;">
+                            <h5 class="mb-0">Low Stock Alert</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Category</th>
+                                            <th>Price</th>
+                                            <th>Current Stock</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in low_stock_products|slice:":5" %}
+                                            <tr>
+                                                <td>{{ product.name }}</td>
+                                                <td>{{ product.category.name }}</td>
+                                                <td>{{ product.price }}</td>
+                                                <td>
+                                                    <span class="badge bg-danger">{{ product.stock }}</span>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'admin_edit_product' product.id %}" class="btn btn-sm btn-outline-primary">Update Stock</a>
+                                                </td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No low stock products</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to the quick action cards
+        const actionCards = document.querySelectorAll('.animated-card');
+        actionCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            setTimeout(() => {
+                card.style.animation = 'fadeIn 0.5s ease-out forwards';
+            }, 100 * index);
+        });
+        
+        // Add hover effect to sidebar items
+        const sidebarItems = document.querySelectorAll('.admin-sidebar a');
+        sidebarItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(5px)';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(0)';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

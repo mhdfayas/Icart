@@ -1,0 +1,46 @@
+<!-- accounts/profile.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4" style="color: #E50046;">My Profile</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <img src="{{ user.profile.profile_image.url }}" class="img-fluid rounded-circle mb-3" alt="Profile" style="width: 150px; height: 150px; object-fit: cover;">
+                    <h3 class="card-title" style="color: #C7DB9C;">{{ user.username }}</h3>
+                    <p class="card-text" style="color: #FFF0BD;">{{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title mb-4" style="color: #C7DB9C;">Edit Profile</h3>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label" style="color: #E50046;">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label" style="color: #E50046;">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="profile_image" class="form-label" style="color: #E50046;">Profile Image</label>
+                            <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
+                            <div class="mt-2">
+                                <small>Current image: <span>{{ user.profile.profile_image.name }}</span></small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background-color: #FDAB9E; border: none;">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

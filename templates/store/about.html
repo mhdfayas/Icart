@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4" style="color: #E50046;">About Us</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{% static 'images/about.jpg' %}" class="img-fluid rounded shadow" alt="About Us">
+        </div>
+        <div class="col-md-6">
+            <h2 class="mb-3" style="color: #C7DB9C;">Our Story</h2>
+            <p class="lead" style="color: #FFF0BD;">Welcome to iCart, your premium shopping destination. We are dedicated to providing you with the best products at competitive prices, along with exceptional customer service.</p>
+            <p style="color: #FFF0BD;">Founded in 2025, iCart has grown to become a trusted name in the e-commerce industry. Our mission is to make online shopping easy, enjoyable, and secure for everyone.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

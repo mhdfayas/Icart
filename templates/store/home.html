@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to iCart{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold hero-title mb-4">Shop the Latest Trends</h1>
+                <p class="lead mb-4">Discover amazing products at unbeatable prices. Quality items delivered to your doorstep.</p>
+                <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">Shop Now</a>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <img src="/static/images/icart.webp" alt="Shopping" class="img-fluid rounded shadow">
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title">Featured Products</h2>
+        <div class="row">
+            {% for product in products|slice:":4" %}
+    <div class="col-md-3 col-sm-6 mb-4">
+        <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
+            <div class="card h-100 animated-card">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <img src="/api/placeholder/300/200" alt="{{ product.name }}" class="card-img-top">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="price mb-2">₹{{ product.price }}</p>
+                    <span class="btn btn-sm btn-outline-primary">View Details</span>
+                </div>
+            </div>
+        </a>
+    </div>
+{% empty %}
+   
+                <div class="col-12">
+                    <div class="alert alert-info">No featured products available at the moment.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="row">
+            {% for category in categories %}
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <a href="{% url 'product_list_by_category' category.slug %}" class="text-decoration-none">
+                        <div class="card h-100 animated-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-box fa-3x mb-3" style="color: var(--red);"></i>
+                                <h5 class="card-title">{{ category.name }}</h5>
+                                <p class="card-text text-muted">Explore {{ category.name }} collection</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">No categories available at the moment.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Special Offers -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title">Special Offers</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card animated-card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="me-4">
+                            <i class="fas fa-truck-fast fa-3x" style="color: var(--red);"></i>
+                        </div>
+
+                        <div>
+                            <h4>Free Shipping</h4>
+                            <p class="mb-0">Free delivery on all orders</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card animated-card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="me-4">
+                            <i class="fas fa-tag fa-3x" style="color: var(--red);"></i>
+                        </div>
+                        <div>
+                            <h4>Weekly Deals</h4>
+                            <p class="mb-0">Save up to 20% on selected items</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="py-5" style="background-color: var(--cream);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h3 class="mb-4">Subscribe to Our Newsletter</h3>
+                <p class="mb-4">Stay updated with our latest products and special offers.</p>
+                <form class="row g-3 justify-content-center">
+                    <div class="col-md-8">
+                        <input type="email" class="form-control" placeholder="Your Email Address">
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

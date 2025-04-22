@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iCart - {% block title %}Online Shopping{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --light-green: #C7DB9C;
+            --cream: #FFF0BD;
+            --salmon: #FDAB9E;
+            --red: #E50046;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--light-green);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--red) !important;
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--red) !important;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background-color: var(--red);
+            border-color: var(--red);
+        }
+        
+        .btn-primary:hover {
+            background-color: #c80038;
+            border-color: #c80038;
+        }
+        
+        .btn-outline-primary {
+            color: var(--red);
+            border-color: var(--red);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--red);
+            border-color: var(--red);
+        }
+        
+        .card {
+            transition: all 0.3s;
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            background-color: var(--light-green);
+            color: #333;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .price {
+            color: var(--red);
+            font-weight: 600;
+        }
+        
+        .badge-sale {
+            background-color: var(--red);
+            color: white;
+        }
+        
+        .hero-section {
+            background-color: var(--cream);
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            position: relative;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--red);
+        }
+        
+        .alert-success {
+            background-color: var(--light-green);
+            border-color: #b8cc8a;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--red);
+            border-color: var(--red);
+        }
+        
+        .cart-item {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .admin-sidebar {
+            background-color: #343a40;
+            color: white;
+            height: 100%;
+            min-height: calc(100vh - 56px);
+        }
+        
+        .admin-sidebar a {
+            color: rgba(255,255,255,0.8);
+            padding: 10px 15px;
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        .admin-sidebar a:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .admin-sidebar .active {
+            background-color: var(--red);
+            color: white;
+        }
+        
+        /* Animation for product cards */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animated-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* Responsive font sizes */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body style="z-index: 10;">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container" >
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-shopping-cart me-2"></i>iCart
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'product_list' %}">Products</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for category in categories %}
+                                {% comment %} <li><a class="dropdown-item" href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li> {% endcomment %}
+                    
+                                 <li><a class="dropdown-item" href="{% url 'product_list_by_category' category.slug %}">{{ category.name }}</a></li>    
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'cart_detail' %}">
+                                <i class="fas fa-shopping-cart me-1"></i> Cart {% if cart_count %}
+                                <span class="badge bg-primary rounded-pill">{{ cart_count }}</span>
+                            {% endif %}
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'orders' %}">My Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">{{ user.username }}</a>
+                        </li>
+                        
+                        {% if user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin_dashboard' %}">Admin Panel</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <a class="navbar-brand" href="{% url 'home' %}">
+                        <i class="fas fa-shopping-cart me-2"></i>iCart
+                    </a>
+                                        <p>Your one-stop shop for all your shopping needs. Quality products at affordable prices.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="text-decoration-none text-dark">Home</a></li>
+                        <li><a href="{% url 'product_list' %}" class="text-decoration-none text-dark">Products</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'cart_detail' %}" class="text-decoration-none text-dark">Cart</a></li>
+                            <li><a href="{% url 'orders' %}" class="text-decoration-none text-dark">My Orders</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}" class="text-decoration-none text-dark">Login</a></li>
+                            <li><a href="{% url 'register' %}" class="text-decoration-none text-dark">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> 123 Shopping Street, City</p>
+                    <p><i class="fas fa-phone me-2"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-envelope me-2"></i> info@icart.com</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-dark me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-dark me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-dark me-2"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; {% now "Y" %} iCart. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+        
+        // Animation for product cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.animated-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.animation = 'fadeIn 0.5s ease-out forwards';
+                }, 100 * index);
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

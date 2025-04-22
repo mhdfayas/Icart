@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Edit Product</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-edit me-2"></i>Product Information
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="category" name="category" required>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required>{{ product.description }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="{{ product.price }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="stock" class="form-label">Stock <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="stock" name="stock" min="0" value="{{ product.stock }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="available" name="available" {% if product.available %}checked{% endif %}>
+                                <label class="form-check-label" for="available">Available</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Image Upload Section -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5 class="mb-3">Product Images</h5>
+                        <p class="text-muted mb-3">Upload up to 8 images. The first image will be shown as the primary image.</p>
+                        
+                        <div class="row" id="image-upload-container">
+                            <!-- Primary Image -->
+                            <div class="col-md-3 mb-3">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        Primary Image <span class="text-danger">*</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <input type="file" class="form-control product-image" id="primary_image" name="primary_image" accept="image/*">
+                                            <div class="form-text">Choose to update</div>
+                                        </div>
+                                        <div class="image-preview mt-2 p-2 border rounded d-flex justify-content-center align-items-center bg-light" style="height: 150px;">
+                                            {% if product.image %}
+                                                <img src="{{ product.image.url }}" class="img-fluid" style="max-height: 130px;" alt="Primary image">
+                                            {% else %}
+                                                <div class="text-muted text-center">
+                                                    <i class="fas fa-image fa-2x mb-2"></i>
+                                                    <p class="mb-0">No primary image</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% for image in product_images %}
+                                            {% if image.is_primary %}
+                                                <div class="mt-2 d-flex justify-content-end">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="delete_image_0" name="delete_image_0" value="{{ image.id }}">
+                                                        <label class="form-check-label text-danger" for="delete_image_0">
+                                                            Delete image
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Images -->
+                            {% for i in "1234567"|make_list %}
+                                {% with index=forloop.counter %}
+                                    {% with additional_image=product_images %}
+                                        <div class="col-md-3 mb-3">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    Additional Image {{ index }}
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <input type="file" class="form-control product-image" id="additional_image_{{ index }}" name="additional_image_{{ index }}" accept="image/*">
+                                                        <div class="form-text">Choose to update</div>
+                                                    </div>
+                                                    <div class="image-preview mt-2 p-2 border rounded d-flex justify-content-center align-items-center bg-light" style="height: 150px;">
+                                                        {% if additional_image %}
+                                                            <img src="{{ additional_image.image.url }}" class="img-fluid" style="max-height: 130px;" alt="Additional image {{ index }}">
+                                                        {% else %}
+                                                            <div class="text-muted text-center">
+                                                                <i class="fas fa-image fa-2x mb-2"></i>
+                                                                <p class="mb-0">No image</p>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    
+                                                    {% if additional_image %}
+                                                        <div class="mt-2 d-flex justify-content-end">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" id="delete_image_{{ index }}" name="delete_image_{{ index }}" value="{{ additional_image.id }}">
+                                                                <label class="form-check-label text-danger" for="delete_image_{{ index }}">
+                                                                    Delete image
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endwith %}
+                                {% endwith %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'admin_product_list' %}" class="btn btn-light">
+                        <i class="fas fa-arrow-left me-1"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Update Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Image preview functionality
+    document.querySelectorAll('.product-image').forEach(function(input) {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                const preview = this.closest('.card-body').querySelector('.image-preview');
+                
+                reader.onload = function(event) {
+                    preview.innerHTML = `<img src="${event.target.result}" class="img-fluid" style="max-height: 130px;">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
+{% endblock %}

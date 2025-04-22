@@ -1,0 +1,226 @@
+
+
+            {% extends 'base.html' %}
+
+            {% block title %}
+                {% if category %}{{ category.name }}{% else %}All Products{% endif %} - iCart
+            {% endblock %}
+            
+            {% block content %}
+            <div class="container my-5">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-lg-3 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Categories</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item {% if not category %}fw-bold{% endif %}">
+                                        <a href="{% url 'product_list' %}" class="text-decoration-none text-dark">All Products</a>
+                                    </li>
+                                    {% for c in categories %}
+                                        <li class="list-group-item {% if category.slug == c.slug %}fw-bold{% endif %}">
+                                            <a href="{% url 'product_list_by_category' c.slug %}"  class="text-decoration-none text-dark">{{ c.name }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Price Range</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="get" id="price-filter-form">
+                                    <div class="mb-3">
+                                        <label for="min-price" class="form-label">Min Price:</label>
+                                        <input type="range" class="form-range" id="min-price" name="min_price" 
+                                               min="0" max="200000" step="10" value="{{ min_price|default:'0' }}">
+                                        <div id="min-price-value" class="text-end">₹{{ min_price|default:'0' }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="max-price" class="form-label">Max Price:</label>
+                                        <input type="range" class="form-range" id="max-price" name="max_price" 
+                                               min="0" max="200000" step="10" value="{{ max_price|default:'200000' }}">
+                                        <div id="max-price-value" class="text-end">₹{{ max_price|default:'200000' }}</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary w-100">Apply Filter</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Products Grid -->
+                    <div class="col-lg-9">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="h4 mb-0">
+                                {% if category %}
+                                    {{ category.name }} Products
+                                {% else %}
+                                    All Products
+                                {% endif %}
+                            </h2>
+                            <div class="d-flex">
+                                <form method="get" class="me-2">
+                                    <select class="form-select form-select-sm" name="sort_by" onchange="this.form.submit()">
+                                        <option value="">Sort by</option>
+                                        <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                        <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                                    </select>
+                                    {% if category_slug %}
+                                        <input type="hidden" name="category_slug" value="{{ category_slug }}">
+                                    {% endif %}
+                                    {% if min_price %}
+                                        <input type="hidden" name="min_price" value="{{ min_price }}">
+                                    {% endif %}
+                                    {% if max_price %}
+                                        <input type="hidden" name="max_price" value="{{ max_price }}">
+                                    {% endif %}
+                                </form>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-th-large"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if products %}
+                                <div class="row">
+                                    {% for product in products %}
+                                        <div class="col-md-4 col-sm-6 mb-4">
+                                            <div class="card h-100 animated-card">
+                                                {% if product.image %}
+                    
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top" style="height: 280px; object-fit: cover;">
+                                                {% else %}
+                                                    <img src="/api/placeholder/300/200" alt="{{ product.name }}" class="card-img-top">
+                                                {% endif %}
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ product.name }}</h5>
+                                                    <p class="text-muted small mb-2">{{ product.category.name }}</p>
+                                                    <p class="price mb-2">₹{{ product.price }}</p>
+                                                    <div class="d-flex justify-content-between">
+                                                        <a href="{% url 'product_detail' product.slug %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                                        {% if product.stock > 0 %}
+                                                            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-cart-plus"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                                <i class="fas fa-times"></i> Out of Stock
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <div class="col-12">
+                                            <div class="alert alert-info">No products found.</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                    
+                            
+                            <!-- Pagination -->
+                            <nav class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    {% if products.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ products.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}">Previous</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for i in products.paginator.page_range %}
+                                        {% if products.number == i %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ i }}</span>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ i }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}">{{ i }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if products.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ products.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}">Next</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Next</span>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% else %}
+                            <div class="col-12">
+                                <div class="alert alert-info">No products found.</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            {% block extra_js %}
+            <script>
+                // Price range slider
+                const minPriceSlider = document.getElementById('min-price');
+                const maxPriceSlider = document.getElementById('max-price');
+                const minPriceValue = document.getElementById('min-price-value');
+                const maxPriceValue = document.getElementById('max-price-value');
+                
+                minPriceSlider.addEventListener('input', function() {
+                    minPriceValue.textContent = '₹' + this.value;
+                    if (parseInt(this.value) > parseInt(maxPriceSlider.value)) {
+                        maxPriceSlider.value = this.value;
+                        maxPriceValue.textContent = '₹' + this.value;
+                    }
+                });
+                
+                maxPriceSlider.addEventListener('input', function() {
+                    maxPriceValue.textContent = '₹' + this.value;
+                    if (parseInt(this.value) < parseInt(minPriceSlider.value)) {
+                        minPriceSlider.value = this.value;
+                        minPriceValue.textContent = '₹' + this.value;
+                    }
+                });
+            
+                // Preserve other query parameters when submitting price filter
+                document.getElementById('price-filter-form').addEventListener('submit', function(e) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const sortBy = urlParams.get('sort_by');
+                    const page = urlParams.get('page');
+                    
+                    if (sortBy) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'sort_by';
+                        input.value = sortBy;
+                        this.appendChild(input);
+                    }
+                    
+                    if (page) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'page';
+                        input.value = page;
+                        this.appendChild(input);
+                    }
+                });
+            </script>
+            {% endblock %}
+            {% endblock %}

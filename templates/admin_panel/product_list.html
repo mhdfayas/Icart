@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Products{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar remains the same -->
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 p-4 bg-light">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Products</h2>
+                <a href="{% url 'admin_add_product' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Product
+                </a>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form class="row g-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search products..." 
+                                       name="search" value="{{ search_query|default:'' }}">
+                                <button class="btn btn-outline-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="category">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" 
+                                        {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="availability">
+                                <option value="">All Status</option>
+                                <option value="true" {% if selected_availability == 'true' %}selected{% endif %}>Available</option>
+                                <option value="false" {% if selected_availability == 'false' %}selected{% endif %}>Not Available</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Products Table -->
+            <div class="card">
+                <div class="card-header" style="background-color: var(--light-green);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">All Products</h5>
+                        <div>
+                            <select class="form-select form-select-sm" onchange="window.location.href = window.location.pathname + '?sort_by=' + this.value">
+                                <option value="">Sort by</option>
+                                <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                                <option value="stock_low" {% if sort_by == 'stock_low' %}selected{% endif %}>Stock: Low to High</option>
+                                <option value="stock_high" {% if sort_by == 'stock_high' %}selected{% endif %}>Stock: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                    <tr class="animated-card">
+                                        <td>
+                                            {% if product.image %}
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="50" height="50" class="rounded">
+                                            {% else %}
+                                                <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <i class="fas fa-image text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ product.name }}</td>
+                                        <td>{{ product.category.name }}</td>
+                                        <td>₹{{ product.price }}</td>
+                                        <td>
+                                            {% if product.stock < 10 %}
+                                                <span class="badge bg-danger">{{ product.stock }}</span>
+                                            {% elif product.stock < 20 %}
+                                                <span class="badge bg-warning text-dark">{{ product.stock }}</span>
+                                            {% else %}
+                                                <span class="badge bg-success">{{ product.stock }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if product.available %}
+                                                <span class="badge bg-success">Available</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Not Available</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'admin_edit_product' product.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_product' product.id %}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                                <a href="{% url 'product_detail' product.slug %}" class="btn btn-sm btn-outline-info" target="_blank">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
+                                            <p class="mb-0">No products found</p>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if products.has_other_pages %}
+                    <div class="card-footer">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if products.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ products.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_availability %}&availability={{ selected_availability }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">Previous</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Previous</span>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for i in products.paginator.page_range %}
+                                    {% if products.number == i %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ i }}</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_availability %}&availability={{ selected_availability }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if products.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ products.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_availability %}&availability={{ selected_availability }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">Next</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Next</span>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation for table rows
+        const tableRows = document.querySelectorAll('.animated-card');
+        tableRows.forEach((row, index) => {
+            row.style.opacity = '0';
+            setTimeout(() => {
+                row.style.animation = 'fadeIn 0.3s ease-out forwards';
+            }, 50 * index);
+        });
+        
+        // Add hover effect to sidebar items
+        const sidebarItems = document.querySelectorAll('.admin-sidebar a');
+        sidebarItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(5px)';
+                }
+            });
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}
