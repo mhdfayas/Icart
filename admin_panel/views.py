@@ -304,3 +304,21 @@ def delete_order(request, order_id):
         messages.success(request, 'Order deleted successfully.')
         return redirect('admin_order_list')
     return render(request, 'admin_panel/delete_order.html', {'order': order})
+
+
+# delete user 
+
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+@login_required
+@user_passes_test(is_admin)
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        user.delete()
+        messages.success(request, 'User and all related data deleted successfully.')
+        return redirect('admin_user_list')
+    return redirect('admin_user_list')
