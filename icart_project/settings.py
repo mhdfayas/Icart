@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'store.context_processors.categories_processor',
             ],
         },
     },
@@ -137,3 +138,8 @@ LOGOUT_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# razorpay settings
+RAZORPAY_KEY_ID = 'rzp_test_2Pav9IRkwJ8xtp'
+RAZORPAY_KEY_SECRET = 'elMJNwxXLSfrxAXRu7wWieNq'

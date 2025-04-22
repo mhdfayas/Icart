@@ -290,3 +290,17 @@ def order_detail(request, order_id):
 def user_list(request):
     users = User.objects.filter(is_staff=False)
     return render(request, 'admin_panel/user_list.html', {'users': users})
+
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
+@login_required
+@user_passes_test(is_admin)
+def delete_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        order.delete()
+        messages.success(request, 'Order deleted successfully.')
+        return redirect('admin_order_list')
+    return render(request, 'admin_panel/delete_order.html', {'order': order})

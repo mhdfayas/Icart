@@ -84,7 +84,7 @@
             background-color: var(--light-green);
             color: #333;
             padding: 30px 0;
-            margin-top: 50px;
+            {% comment %} margin-top: 50px; {% endcomment %}
         }
         
         .price {
@@ -183,7 +183,7 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body style="z-index: 10;">
+<body style="z-index: 10; min-height: 100vh; display: flex; flex-direction: column;">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container" >
@@ -207,9 +207,9 @@
                         </a>
                         <ul class="dropdown-menu">
                             {% for category in categories %}
-                                {% comment %} <li><a class="dropdown-item" href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li> {% endcomment %}
+                                <li><a class="dropdown-item" href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
                     
-                                 <li><a class="dropdown-item" href="{% url 'product_list_by_category' category.slug %}">{{ category.name }}</a></li>    
+                                 {% comment %} <li><a class="dropdown-item" href="{% url 'product_list_by_category' category.slug %}">{{ category.name }}</a></li>     {% endcomment %}
                             {% endfor %}
                         </ul>
                     </li>
@@ -265,7 +265,9 @@
     {% endif %}
 
     <!-- Main content -->
-    {% block content %}{% endblock %}
+    <div style="flex: 1 0 auto;">
+        {% block content %}{% endblock %}
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -275,7 +277,7 @@
                     <a class="navbar-brand" href="{% url 'home' %}">
                         <i class="fas fa-shopping-cart me-2"></i>iCart
                     </a>
-                                        <p>Your one-stop shop for all your shopping needs. Quality products at affordable prices.</p>
+                    <p>Your trusted Apple reseller — delivering genuine Apple products with quality service and great prices.</p>
                 </div>
                 <div class="col-md-4">
                     <h5>Quick Links</h5>
@@ -293,8 +295,8 @@
                 </div>
                 <div class="col-md-4">
                     <h5>Contact Us</h5>
-                    <p><i class="fas fa-map-marker-alt me-2"></i> 123 Shopping Street, City</p>
-                    <p><i class="fas fa-phone me-2"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> Church Street, Bengaluru</p>
+                    <p><i class="fas fa-phone me-2"></i> +91 8945678921</p>
                     <p><i class="fas fa-envelope me-2"></i> info@icart.com</p>
                     <div class="social-icons">
                         <a href="#" class="text-dark me-2"><i class="fab fa-facebook-f"></i></a>

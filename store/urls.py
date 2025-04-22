@@ -23,4 +23,5 @@ urlpatterns = [
     path('faq/', views.faq, name='faq'),
     path('profile/', views.profile, name='profile'),
     path('shipping/', views.shipping, name='shipping'),
+    path('razorpay/success/', views.razorpay_success, name='razorpay_success'),
 ]

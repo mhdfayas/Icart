@@ -11,5 +11,7 @@ urlpatterns = [
     path('categories/add/', views.add_category, name='admin_add_category'),
     path('orders/', views.order_list, name='admin_order_list'),
     path('orders/<int:order_id>/', views.order_detail, name='admin_order_detail'),
+    path('orders/delete/<int:order_id>/', views.delete_order, name='admin_delete_order'),
     path('users/', views.user_list, name='admin_user_list'),
+    
 ]

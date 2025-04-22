@@ -183,30 +183,152 @@ def remove_from_cart(request, item_id):
         
     return HttpResponseRedirect(reverse('cart_detail'))
 
+# @login_required
+# def checkout(request):
+#     # Handle checkout process
+#     if request.method == 'POST':
+#         address = request.POST.get('address')
+#         phone = request.POST.get('phone')
+        
+#         cart, created = Cart.objects.get_or_create(user=request.user)
+#         cart_items = CartItem.objects.filter(cart=cart)
+        
+#         if not cart_items:
+#             return redirect('cart_detail')
+            
+#         total = sum(item.product.price * item.quantity for item in cart_items)
+        
+#         # Create order
+#         order = Order.objects.create(
+#             user=request.user,
+#             address=address,
+#             phone=phone,
+#             total_price=total
+#         )
+        
+#         # Create order items
+#         for item in cart_items:
+#             OrderItem.objects.create(
+#                 order=order,
+#                 product=item.product,
+#                 price=item.product.price,
+#                 quantity=item.quantity
+#             )
+            
+#         # Clear cart
+#         cart_items.delete()
+        
+#         return redirect('order_complete', order_id=order.id)
+    
+#     cart, created = Cart.objects.get_or_create(user=request.user)
+#     cart_items = CartItem.objects.filter(cart=cart)
+#     total = sum(item.product.price * item.quantity for item in cart_items)
+    
+#     return render(request, 'store/checkout.html', {
+#         'cart_items': cart_items,
+#         'total': total
+#     })
+
+#  razorpay integration
+
+import razorpay
+from django.conf import settings
+from django.shortcuts import render, redirect
+from .models import Cart, CartItem, Order, OrderItem
+
 @login_required
 def checkout(request):
-    # Handle checkout process
     if request.method == 'POST':
         address = request.POST.get('address')
         phone = request.POST.get('phone')
-        
+        payment_method = request.POST.get('payment_method')
+
         cart, created = Cart.objects.get_or_create(user=request.user)
         cart_items = CartItem.objects.filter(cart=cart)
-        
+
         if not cart_items:
             return redirect('cart_detail')
-            
+
         total = sum(item.product.price * item.quantity for item in cart_items)
-        
-        # Create order
+
+        if payment_method == 'online':
+            # Initialize Razorpay client
+            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+            # Create Razorpay order
+            razorpay_order = client.order.create({
+                'amount': int(total * 100),  # Amount in paise
+                'currency': 'INR',
+                'payment_capture': '1'
+            })
+
+            # Pass Razorpay order details to the template
+            return render(request, 'store/razorpay_payment.html', {
+                'razorpay_order_id': razorpay_order['id'],
+                'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+                'amount': int(total * 100),
+                'address': address,
+                'phone': phone,
+            })
+
+        else:
+            # Handle Cash on Delivery
+            order = Order.objects.create(
+                user=request.user,
+                address=address,
+                phone=phone,
+                total_price=total
+            )
+
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    price=item.product.price,
+                    quantity=item.quantity
+                )
+
+            cart_items.delete()
+
+            return redirect('order_complete', order_id=order.id)
+
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart_items = CartItem.objects.filter(cart=cart)
+    total = sum(item.product.price * item.quantity for item in cart_items)
+
+    return render(request, 'store/checkout.html', {
+        'cart_items': cart_items,
+        'total': total
+    })
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+@csrf_exempt
+@login_required
+def razorpay_success(request):
+    if request.method == 'POST':
+        payment_id = request.POST.get('razorpay_payment_id')
+        razorpay_order_id = request.POST.get('razorpay_order_id')
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+
+        print("Received:", payment_id, razorpay_order_id, address, phone)
+
+        cart = Cart.objects.get(user=request.user)
+        cart_items = CartItem.objects.filter(cart=cart)
+        total = sum(item.product.price * item.quantity for item in cart_items)
+
+        # Now create the order
         order = Order.objects.create(
             user=request.user,
             address=address,
             phone=phone,
-            total_price=total
+            total_price=total,
+            razorpay_order_id=razorpay_order_id,
+            razorpay_payment_id=payment_id,
+            status='processing'
         )
-        
-        # Create order items
         for item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -214,21 +336,12 @@ def checkout(request):
                 price=item.product.price,
                 quantity=item.quantity
             )
-            
-        # Clear cart
         cart_items.delete()
-        
-        return redirect('order_complete', order_id=order.id)
-    
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    cart_items = CartItem.objects.filter(cart=cart)
-    total = sum(item.product.price * item.quantity for item in cart_items)
-    
-    return render(request, 'store/checkout.html', {
-        'cart_items': cart_items,
-        'total': total
-    })
+        return JsonResponse({'success': True, 'order_id': order.id})
 
+    return JsonResponse({'success': False})
+
+##################################################################################
 @login_required
 def order_complete(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)

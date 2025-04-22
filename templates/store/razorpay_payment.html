@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <p>Address: {{ address }}</p>
+    <p>Phone: {{ phone }}</p>
+
+    
+    <h2 class="mb-4">Complete Your Payment</h2>
+    <form id="razorpay-form">
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <input type="hidden" name="order_id" id="order_id" value="{{ order_id }}">
+    </form>
+</div>
+<script>
+    function razorpaySuccessHandler(response) {
+        fetch("{% url 'razorpay_success' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id={{ razorpay_order_id }}&address={{ address }}&phone={{ phone }}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = "/order/complete/" + data.order_id + "/";
+            } else {
+                alert("Payment verification failed. Please contact support.");
+                window.location.href = "/cart/";
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var options = {
+            key: "{{ razorpay_key_id }}",
+            order_id: "{{ razorpay_order_id }}",
+            amount: "{{ amount }}",
+            currency: "INR",
+            handler: razorpaySuccessHandler,
+            name: "iCart",
+            description: "Order Payment",
+            modal: {
+                ondismiss: function() {
+                    alert("Payment failed or cancelled. Redirecting to cart.");
+                    window.location.href = "/cart/";
+                }
+            }
+        };
+        var rzp = new Razorpay(options);
+        rzp.open();
+    });
+</script>
+{% endblock %}
