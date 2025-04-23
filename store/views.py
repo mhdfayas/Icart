@@ -436,3 +436,23 @@ def newsletter_subscribe(request):
 
 from django import template
 register = template.Library()
+
+from django.db.models import Q
+
+def search(request):
+    query = request.GET.get('q', '')
+    products = []
+    
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query)
+        ).filter(available=True)
+    
+    context = {
+        'query': query,
+        'products': products,
+    }
+    
+    return render(request, 'store/search_results.html', context)

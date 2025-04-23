@@ -213,6 +213,20 @@
                         </ul>
                     </li>
                 </ul>
+                <!-- Add this after the Categories dropdown in the navbar -->
+                <form class="d-flex ms-auto me-3" action="{% url 'search' %}" method="GET">
+                    <div class="input-group">
+                        <input type="search" 
+                               name="q" 
+                               class="form-control" 
+                               placeholder="Search products..." 
+                               value="{{ request.GET.q|default:'' }}"
+                               aria-label="Search">
+                        <button class="btn btn-outline-dark" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
