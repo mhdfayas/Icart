@@ -27,8 +27,8 @@
             if (data.success) {
                 window.location.href = "/order/complete/" + data.order_id + "/";
             } else {
-                alert("Payment verification failed. Please contact support.");
-                window.location.href = "/cart/";
+                
+                window.location.href = "/cart/?error=payment_failed";
             }
         });
     }
@@ -44,8 +44,8 @@
             description: "Order Payment",
             modal: {
                 ondismiss: function() {
-                    alert("Payment failed or cancelled. Redirecting to cart.");
-                    window.location.href = "/cart/";
+                    
+                    window.location.href = "/cart/?error=payment_cancelled";
                 }
             }
         };

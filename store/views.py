@@ -153,6 +153,12 @@ from .models import Cart, CartItem, Product
 def cart_detail(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
+    error = request.GET.get('error')
+    if error:
+        if error == 'payment_cancelled':
+            messages.error(request, 'Payment was cancelled. Please try again.')
+        else:
+            messages.error(request, "An error occurred. Please try again.")
     
     total = sum(item.product.price * item.quantity for item in cart_items)
     
@@ -340,9 +346,12 @@ def razorpay_success(request):
                 quantity=item.quantity
             )
         cart_items.delete()
+        messages.success(request, 'Order placed successfully!')
         return JsonResponse({'success': True, 'order_id': order.id})
 
-    return JsonResponse({'success': False})
+    else:
+        messages.error(request, 'Payment failed. Please try again.')
+        return JsonResponse({'success': False})
 
 ##################################################################################
 @login_required
