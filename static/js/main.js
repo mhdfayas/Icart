@@ -5,36 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     });
 
-    // Product quantity increment/decrement
-    const quantityInputs = document.querySelectorAll('.quantity-input');
     
-    if (quantityInputs) {
-        quantityInputs.forEach(input => {
-            const decrementBtn = input.previousElementSibling;
-            const incrementBtn = input.nextElementSibling;
-            
-            if (decrementBtn && incrementBtn) {
-                decrementBtn.addEventListener('click', () => {
-                    if (input.value > 1) {
-                        input.value = parseInt(input.value) - 1;
-                        updateQuantity(input);
-                    }
-                });
-                
-                incrementBtn.addEventListener('click', () => {
-                    input.value = parseInt(input.value) + 1;
-                    updateQuantity(input);
-                });
-                
-                input.addEventListener('change', () => {
-                    if (input.value < 1 || isNaN(input.value)) {
-                        input.value = 1;
-                    }
-                    updateQuantity(input);
-                });
-            }
-        });
-    }
 // Add to cart functionality with animation
     const addToCartBtns = document.querySelectorAll('.add-to-cart');
     

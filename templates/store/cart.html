@@ -33,7 +33,7 @@
                                 {% csrf_token %}
                                 <div class="input-group">
                                     <button type="button" class="btn btn-sm btn-outline-secondary decrease-qty">-</button>
-                                    <input type="number" name="quantity" class="form-control quantity-input" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}">
+                                    <input type="number" name="quantity" class="form-control quantity-input" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" readonly>
                                     <button type="button" class="btn btn-sm btn-outline-secondary increase-qty">+</button>
                                 </div>
                             </form>
@@ -97,7 +97,7 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    {% comment %} document.addEventListener('DOMContentLoaded', function() {
         // Quantity increase and decrease buttons
         const decreaseButtons = document.querySelectorAll('.decrease-qty');
         const increaseButtons = document.querySelectorAll('.increase-qty');
@@ -128,8 +128,52 @@
             input.addEventListener('change', function() {
                 this.closest('form').submit();
             });
+        }); 
+    }); {% endcomment %}
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const decreaseButtons = document.querySelectorAll('.decrease-qty');
+        const increaseButtons = document.querySelectorAll('.increase-qty');
+        
+        // Remove any existing event listeners
+        decreaseButtons.forEach(button => {
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+        });
+        
+        increaseButtons.forEach(button => {
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+        });
+        
+        // Add new event listeners
+        document.querySelectorAll('.decrease-qty').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();  // Stop event bubbling
+                const input = this.parentNode.querySelector('.quantity-input');
+                if (parseInt(input.value) > parseInt(input.min)) {
+                    input.value = parseInt(input.value) - 1;
+                    this.closest('form').submit();
+                }
+            }, { once: true });  
+        });
+        
+        document.querySelectorAll('.increase-qty').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();  // Stop event bubbling
+                const input = this.parentNode.querySelector('.quantity-input');
+                if (parseInt(input.value) < parseInt(input.max)) {
+                    input.value = parseInt(input.value) + 1;
+                    this.closest('form').submit();
+                }
+            }, { once: true });  
         });
     });
+
+
+
 </script>
 {% endblock %}
 {% endblock %}
