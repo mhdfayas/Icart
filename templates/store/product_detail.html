@@ -258,14 +258,28 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between mb-2">
                                             <h6 class="card-title mb-0">{{ review.user.get_full_name|default:review.user.username }}</h6>
-                                            <div>
-                                                {% for i in "12345"|make_list %}
-                                                    {% if forloop.counter <= review.rating %}
-                                                        <i class="fas fa-star text-warning"></i>
-                                                    {% else %}
-                                                        <i class="far fa-star text-warning"></i>
-                                                    {% endif %}
-                                                {% endfor %}
+                                            <div class="d-flex align-items-center">
+                                                <!-- Star ratings -->
+                                                <div class="me-3">
+                                                    {% for i in "12345"|make_list %}
+                                                        {% if forloop.counter <= review.rating %}
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star text-warning"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                
+                                                <!-- Delete button (only shown to review owner) -->
+                                                {% if review.user == user %}
+                                                    <form method="post" action="{% url 'delete_review' review.id %}" class="delete-review-form">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-link text-danger p-0" 
+                                                                onclick="return confirm('Are you sure you want to delete your review?')">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <p class="text-muted small">Posted on: {{ review.created_at|date:"F d, Y" }}</p>

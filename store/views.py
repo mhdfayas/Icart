@@ -440,7 +440,7 @@ register = template.Library()
 from django.db.models import Q
 
 def search(request):
-    query = request.GET.get('q', '')
+    query = request.GET.get('q', '').strip()
     products = []
     
     if query:
@@ -448,11 +448,28 @@ def search(request):
             Q(name__icontains=query) |
             Q(description__icontains=query) |
             Q(category__name__icontains=query)
-        ).filter(available=True)
+        ).distinct()
+        
+        if not products:
+            messages.info(request, f'No products found matching "{query}"')
     
-    context = {
-        'query': query,
+    return render(request, 'store/search_results.html', {
         'products': products,
-    }
+        'query': query
+    })
+
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id)
     
-    return render(request, 'store/search_results.html', context)
+    # Check if the user owns this review
+    if review.user != request.user:
+        messages.error(request, "You cannot delete someone else's review.")
+        return redirect('product_detail', slug=review.product.slug)
+    
+    # Store product slug before deletion for redirect
+    product_slug = review.product.slug

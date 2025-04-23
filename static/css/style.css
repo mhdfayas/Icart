@@ -1,0 +1,11 @@
+.delete-review-form {
+    display: inline;
+}
+
+.delete-review-form button {
+    transition: color 0.2s;
+}
+
+.delete-review-form button:hover {
+    color: #dc3545 !important;
+}

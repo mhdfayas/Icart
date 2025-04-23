@@ -179,13 +179,65 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* Search bar styling */
+        .search-wrapper {
+            width: 300px;
+            margin: 0 15px;
+        }
+
+        .search-input {
+            border-radius: 25px 0 0 25px !important;
+            border: 2px solid var(--red);
+            border-right: none;
+            padding-left: 20px;
+            height: 45px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            box-shadow: none;
+            border-color: var(--red);
+            background-color: white;
+        }
+
+        .search-btn {
+            border-radius: 0 25px 25px 0 !important;
+            background-color: var(--red);
+            border: 2px solid var(--red);
+            color: white;
+            padding: 0 25px;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background-color: #c80038;
+            border-color: #c80038;
+            transform: translateX(3px);
+        }
+
+        /* Responsive search bar */
+        @media (max-width: 768px) {
+            .search-wrapper {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .search-input {
+                height: 40px;
+            }
+            
+            .search-btn {
+                padding: 0 15px;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body style="z-index: 10; min-height: 100vh; display: flex; flex-direction: column;">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container" >
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
                 <i class="fas fa-shopping-cart me-2"></i>iCart
             </a>
@@ -193,7 +245,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
@@ -201,39 +253,34 @@
                         <a class="nav-link" href="{% url 'product_list' %}">Products</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             Categories
                         </a>
                         <ul class="dropdown-menu">
                             {% for category in categories %}
                                 <li><a class="dropdown-item" href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
-                    
-                                 {% comment %} <li><a class="dropdown-item" href="{% url 'product_list_by_category' category.slug %}">{{ category.name }}</a></li>     {% endcomment %}
                             {% endfor %}
                         </ul>
                     </li>
                 </ul>
-                <!-- Add this after the Categories dropdown in the navbar -->
                 <form class="d-flex ms-auto me-3" action="{% url 'search' %}" method="GET">
-                    <div class="input-group">
-                        <input type="search" 
-                               name="q" 
-                               class="form-control" 
-                               placeholder="Search products..." 
-                               value="{{ request.GET.q|default:'' }}"
-                               aria-label="Search">
-                        <button class="btn btn-outline-dark" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
+                    <div class="search-wrapper">
+                        <div class="input-group">
+                            <input type="search" name="q" class="form-control search-input" placeholder="Search products..." value="{{ request.GET.q|default:'' }}" aria-label="Search">
+                            <button class="btn search-btn" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                     </div>
                 </form>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'cart_detail' %}">
-                                <i class="fas fa-shopping-cart me-1"></i> Cart {% if cart_count %}
-                                <span class="badge bg-primary rounded-pill">{{ cart_count }}</span>
-                            {% endif %}
+                                <i class="fas fa-shopping-cart me-1"></i> Cart 
+                                {% if cart_count %}
+                                    <span class="badge bg-primary rounded-pill">{{ cart_count }}</span>
+                                {% endif %}
                             </a>
                         </li>
                         
@@ -276,8 +323,6 @@
             {% endfor %}
         </div>
     {% endif %}
-
-    
 
     <!-- Main content -->
     <div style="flex: 1 0 auto;">

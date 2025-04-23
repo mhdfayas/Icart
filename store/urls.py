@@ -25,4 +25,5 @@ urlpatterns = [
     path('shipping/', views.shipping, name='shipping'),
     path('razorpay/success/', views.razorpay_success, name='razorpay_success'),
     path('search/', views.search, name='search'),
+    path('review/delete/<int:review_id>/', views.delete_review, name='delete_review'),
 ]
