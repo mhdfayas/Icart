@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load product_tags %}
+
 
 {% block content %}
 <div class="container my-5">
@@ -103,47 +105,64 @@
                                 </div>
                             </div>
                             
+                        
+                           
                             <!-- Additional Images -->
+                            {% with non_primary_images=product_images.all %}
                             {% for i in "1234567"|make_list %}
                                 {% with index=forloop.counter %}
-                                    {% with additional_image=product_images %}
-                                        <div class="col-md-3 mb-3">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    Additional Image {{ index }}
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Additional Image {{ index }}
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <input type="file" class="form-control product-image" 
+                                                        id="additional_image_{{ index }}" 
+                                                        name="additional_image_{{ index }}" 
+                                                        accept="image/*">
+                                                    <div class="form-text">Choose to update</div>
                                                 </div>
-                                                <div class="card-body">
-                                                    <div class="form-group">
-                                                        <input type="file" class="form-control product-image" id="additional_image_{{ index }}" name="additional_image_{{ index }}" accept="image/*">
-                                                        <div class="form-text">Choose to update</div>
-                                                    </div>
-                                                    <div class="image-preview mt-2 p-2 border rounded d-flex justify-content-center align-items-center bg-light" style="height: 150px;">
-                                                        {% if additional_image %}
-                                                            <img src="{{ additional_image.image.url }}" class="img-fluid" style="max-height: 130px;" alt="Additional image {{ index }}">
+                                                <div class="image-preview mt-2 p-2 border rounded d-flex justify-content-center align-items-center bg-light" 
+                                                    style="height: 150px;">
+                                                    {% with current_image=non_primary_images|get_item:forloop.counter0 %}
+                                                        {% if current_image and not current_image.is_primary %}
+                                                            <img src="{{ current_image.image.url }}" 
+                                                                class="img-fluid" 
+                                                                style="max-height: 130px;" 
+                                                                alt="Additional image {{ index }}">
                                                         {% else %}
                                                             <div class="text-muted text-center">
                                                                 <i class="fas fa-image fa-2x mb-2"></i>
                                                                 <p class="mb-0">No image</p>
                                                             </div>
                                                         {% endif %}
-                                                    </div>
-                                                    
-                                                    {% if additional_image %}
-                                                        <div class="mt-2 d-flex justify-content-end">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" id="delete_image_{{ index }}" name="delete_image_{{ index }}" value="{{ additional_image.id }}">
-                                                                <label class="form-check-label text-danger" for="delete_image_{{ index }}">
-                                                                    Delete image
-                                                                </label>
+                                                    </div>    
+                                                        {% if current_image and not current_image.is_primary %}
+                                                            <div class="mt-2 d-flex justify-content-end">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" 
+                                                                        type="checkbox" 
+                                                                        id="delete_image_{{ index }}" 
+                                                                        name="delete_image_{{ index }}" 
+                                                                        value="{{ current_image.id }}">
+                                                                    <label class="form-check-label text-danger" 
+                                                                        for="delete_image_{{ index }}">
+                                                                        Delete image
+                                                                    </label>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                
                                             </div>
                                         </div>
-                                    {% endwith %}
+                                    </div>
                                 {% endwith %}
                             {% endfor %}
+                            {% endwith %}
+                        
                         </div>
                     </div>
                 </div>

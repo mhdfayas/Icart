@@ -124,7 +124,7 @@ def product_detail(request, slug):
         'related_products': related_products,
     })
 
-
+    
 @login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -137,7 +137,10 @@ def add_to_cart(request, product_id):
     except CartItem.DoesNotExist:
         CartItem.objects.create(cart=cart, product=product)
     
-    return redirect('cart_detail')
+    # return redirect('product_detail', slug=slug)
+    messages.success(request, 'Item added to cart successfully')    
+    return redirect(request.META.get('HTTP_REFERER', 'product_list'))
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -422,4 +425,5 @@ def newsletter_subscribe(request):
         return redirect('home')
     return redirect('home')
 
-
+from django import template
+register = template.Library()
