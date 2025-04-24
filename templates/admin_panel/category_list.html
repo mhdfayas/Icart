@@ -2,25 +2,64 @@
 {% load static %}
 
 {% block content %}
-<h1>Category List</h1>
-<a href="{% url 'admin_add_category' %}" class="btn btn-primary mb-3">Add Category</a>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for category in categories %}
-        <tr>
-            <td>{{ category.name }}</td>
-            <td>
-                <a href="#" class="btn btn-sm btn-warning">Edit</a>
-                <a href="#" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 p-0">
+            <div class="admin-sidebar py-4">
+                <div class="px-3 mb-4">
+                    <h4 class="text-light"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</h4>
+                </div>
+                <a href="{% url 'admin_dashboard' %}" class="active">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'admin_product_list' %}">
+                    <i class="fas fa-box me-2"></i> Products
+                </a>
+                <a href="{% url 'admin_category_list' %}">
+                    <i class="fas fa-tags me-2"></i> Categories
+                </a>
+                <a href="{% url 'admin_order_list' %}">
+                    <i class="fas fa-shopping-bag me-2"></i> Orders
+                </a>
+                <a href="{% url 'admin_user_list' %}">
+                    <i class="fas fa-users me-2"></i> Users
+                </a>
+                <a href="{% url 'home' %}">
+                    <i class="fas fa-store me-2"></i> View Store
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 p-4 bg-light">
+
+            <h1>Category List</h1>
+            <a href="{% url 'admin_add_category' %}" class="btn btn-primary mb-3">Add Category</a>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.name }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if categories.count == 0 %}
+                <div class="alert alert-info">No categories available.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>   
+      
 {% endblock %}

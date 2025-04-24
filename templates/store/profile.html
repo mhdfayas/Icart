@@ -4,21 +4,21 @@
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center mb-4" style="color: #E50046;">My Profile</h1>
+    <h1 class="text-center mb-4" style="color: var(--primary);">My Profile</h1>
     <div class="row">
         <div class="col-md-4">
             <div class="card shadow">
                 <div class="card-body text-center">
                     <img src="{{ user.profile.profile_image.url }}" class="img-fluid rounded-circle mb-3" alt="Profile" style="width: 150px; height: 150px; object-fit: cover;">
-                    <h3 class="card-title" style="color: #C7DB9C;">{{ user.username }}</h3>
-                    <p class="card-text" style="color: #FFF0BD;">{{ user.email }}</p>
+                    <h3 class="card-title" style="color: var(--primary);">{{ user.username }}</h3>
+                    <p class="card-text" style="color: var(--secondary);">{{ user.email }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-body">
-                    <h3 class="card-title mb-4" style="color: #C7DB9C;">Edit Profile</h3>
+                    <h3 class="card-title mb-4" style="color: var(--secondary);">Edit Profile</h3>
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="mb-3">
@@ -36,7 +36,7 @@
                                 <small>Current image: <span>{{ user.profile.profile_image.name }}</span></small>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="background-color: #FDAB9E; border: none;">Update Profile</button>
+                        <button type="submit" class="btn btn-success"  border: none;">Update Profile</button>
                     </form>
                 </div>
             </div>

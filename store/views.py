@@ -466,10 +466,15 @@ from django.contrib.auth.decorators import login_required
 def delete_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
     
-    # Check if the user owns this review
-    if review.user != request.user:
-        messages.error(request, "You cannot delete someone else's review.")
-        return redirect('product_detail', slug=review.product.slug)
-    
-    # Store product slug before deletion for redirect
-    product_slug = review.product.slug
+    # Check if the user is authorized to delete the review
+    if request.user == review.user:
+        # Get the product before deleting the review
+        product = review.product
+        # Delete the review
+        review.delete()
+        messages.success(request, 'Review deleted successfully.')
+        # Redirect back to the product detail page
+        return redirect('product_detail', slug=product.slug)
+    else:
+        messages.error(request, 'You are not authorized to delete this review.')
+        return redirect('home')

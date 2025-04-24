@@ -1,31 +1,66 @@
 {% extends 'base.html' %}
-{% load static %}
+
+{% block title %}Admin - Orders{% endblock %}
 
 {% block content %}
-<h1>Order List</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>User</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for order in orders %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.user.username }}</td>
-            <td>₹{{ order.total_price }}</td>
-            <td>{{ order.status }}</td>
-            <td>
-                <a href="{% url 'admin_order_detail' order.id %}" class="btn btn-sm btn-primary">View</a>
-                <a href="{% url 'admin_delete_order' order.id %}" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 p-0">
+            <div class="admin-sidebar py-4">
+                <div class="px-3 mb-4">
+                    <h4 class="text-light"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</h4>
+                </div>
+                <a href="{% url 'admin_dashboard' %}">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'admin_product_list' %}">
+                    <i class="fas fa-box me-2"></i> Products
+                </a>
+                <a href="{% url 'admin_category_list' %}">
+                    <i class="fas fa-tags me-2"></i> Categories
+                </a>
+                <a href="{% url 'admin_order_list' %}" class="active">
+                    <i class="fas fa-shopping-bag me-2"></i> Orders
+                </a>
+                <a href="{% url 'admin_user_list' %}">
+                    <i class="fas fa-users me-2"></i> Users
+                </a>
+                <a href="{% url 'home' %}">
+                    <i class="fas fa-store me-2"></i> View Store
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 p-4 bg-light">
+            <h1>Order List</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>₹{{ order.total_price }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>
+                            <a href="{% url 'admin_order_detail' order.id %}" class="btn btn-sm btn-primary">View</a>
+                            <a href="{% url 'admin_delete_order' order.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
