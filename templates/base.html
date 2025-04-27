@@ -194,15 +194,27 @@
             height: 3px;
             background-color: var(--red);
         }
-
+        .alert {
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
         .alert-success {
-            background-color: var(--light-green);
-            border-color: #b8cc8a;
+            background-color: #f0fff4;
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        .alert-error {
+            background-color: #fff5f5;
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
         }
 
         .page-item.active .page-link {
-            background-color: var(--red);
-            border-color: var(--red);
+            background-color: var(--primary);
+            border-color: var(--primary);
         }
 
         .cart-item {
@@ -214,10 +226,11 @@
         }
 
         .admin-sidebar {
-            background-color: var(--primary);
+            background-color: var(--secondary);
             color: white;
             height: 100%;
             min-height: calc(100vh - 56px);
+            
         }
 
         .admin-sidebar a {
@@ -225,6 +238,7 @@
             padding: 10px 15px;
             display: block;
             transition: all 0.3s;
+            text-decoration: none;
         }
 
         .admin-sidebar a:hover {

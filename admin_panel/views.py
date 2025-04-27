@@ -17,17 +17,28 @@ def is_admin(user):
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
+    # Get low stock products (for example, items with stock less than 5)
+    low_stock_products = Product.objects.filter(stock__lte=5).select_related('category')
+    
+    # Get recent orders (last 10 orders)
+    recent_orders = Order.objects.select_related('user').order_by('-created_at')[:10]
+    
+    # Get counts for dashboard stats
     total_products = Product.objects.count()
     total_orders = Order.objects.count()
-    pending_orders = Order.objects.filter(status='pending').count()
-    total_users = User.objects.filter(is_staff=False).count()
-    
-    return render(request, 'admin_panel/dashboard.html', {
+    pending_orders = Order.objects.filter(status='Pending').count()
+    total_users = User.objects.filter(is_superuser=False).count()
+
+    context = {
         'total_products': total_products,
         'total_orders': total_orders,
         'pending_orders': pending_orders,
-        'total_users': total_users
-    })
+        'total_users': total_users,
+        'low_stock_products': low_stock_products,
+        'recent_orders': recent_orders,
+    }
+    
+    return render(request, 'admin_panel/dashboard.html', context)
 
 
 @login_required
