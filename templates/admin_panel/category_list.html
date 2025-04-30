@@ -33,7 +33,6 @@
 
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10 p-4 bg-light">
-
             <h1>Category List</h1>
             <a href="{% url 'admin_add_category' %}" class="btn btn-primary mb-3">Add Category</a>
             <table class="table">
@@ -48,8 +47,21 @@
                     <tr>
                         <td>{{ category.name }}</td>
                         <td>
-                            <a href="#" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                            <div class="d-flex gap-2">
+                                <form method="post" action="{% url 'admin_edit_category' category.id %}" class="d-inline" onsubmit="return confirmEdit('{{ category.name }}')">
+                                    {% csrf_token %}
+                                    <input type="text" name="name" id="edit-name-{{ category.id }}" style="display: none;">
+                                    <button type="submit" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'admin_delete_category' category.id %}" class="d-inline" onsubmit="return confirmDelete('{{ category.name }}')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -61,5 +73,18 @@
         </div>
     </div>
 </div>   
-      
+<script>
+function confirmDelete(categoryName) {
+    return confirm(`Are you sure you want to delete the category "${categoryName}"?\nThis action cannot be undone.`);
+}
+
+function confirmEdit(categoryName) {
+    const newName = prompt('Enter new category name:', categoryName);
+    if (newName && newName !== categoryName) {
+        document.getElementById(`edit-name-${event.target.closest('form').action.split('/').slice(-2)[0]}`).value = newName;
+        return true;
+    }
+    return false;
+}
+</script>
 {% endblock %}

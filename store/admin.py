@@ -6,10 +6,17 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'stock', 'available', 'created', 'updated')
+    list_display = ('name', 'category', 'price', 'discount_percentage', 'discounted_price', 
+                   'stock', 'available', 'created', 'updated')
     list_filter = ('available', 'created', 'updated', 'category')
-    list_editable = ('price', 'stock', 'available')
+    list_editable = ('price', 'stock', 'available', 'discount_percentage')
     prepopulated_fields = {'slug': ('name',)}
+    
+    def discounted_price(self, obj):
+        if obj.discount_percentage > 0:
+            return f"₹{obj.discounted_price}"
+        return "-"
+    discounted_price.short_description = "Final Price"
 
 class CartAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'created_at')

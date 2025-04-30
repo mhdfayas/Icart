@@ -150,17 +150,16 @@ from django.contrib import messages
 from .models import Cart, CartItem, Product
 
 @login_required
+@login_required
 def cart_detail(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
-    error = request.GET.get('error')
-    if error:
-        if error == 'payment_cancelled':
-            messages.error(request, 'Payment was cancelled. Please try again.')
-        else:
-            messages.error(request, "An error occurred. Please try again.")
     
-    total = sum(item.product.price * item.quantity for item in cart_items)
+    # Calculate total considering discounts
+    total = sum(
+        (item.product.discounted_price if item.product.has_discount else item.product.price) * item.quantity 
+        for item in cart_items
+    )
     
     return render(request, 'store/cart.html', {
         'cart_items': cart_items,
@@ -247,19 +246,35 @@ from .models import Cart, CartItem, Order, OrderItem
 
 @login_required
 def checkout(request):
+    cart = Cart.objects.get(user=request.user)
+    cart_items = CartItem.objects.filter(cart=cart)
+    
+    # Calculate item totals
+    for item in cart_items:
+        if item.product.has_discount:
+            item.total = item.product.discounted_price * item.quantity
+        else:
+            item.total = item.product.price * item.quantity
+    
+    # Calculate subtotal and total
+    subtotal = sum(item.total for item in cart_items)
+    total = subtotal  # Add shipping cost here if needed
+    
+    context = {
+        'cart_items': cart_items,
+        'subtotal': subtotal,
+        'total': total,
+    }
+    
     if request.method == 'POST':
         address = request.POST.get('address')
         phone = request.POST.get('phone')
         payment_method = request.POST.get('payment_method')
 
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        cart_items = CartItem.objects.filter(cart=cart)
-
         if not cart_items:
             return redirect('cart_detail')
 
-        total = sum(item.product.price * item.quantity for item in cart_items)
-
+        # Use the calculated total for payment processing
         if payment_method == 'online':
             # Initialize Razorpay client
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -290,25 +305,29 @@ def checkout(request):
             )
 
             for item in cart_items:
+                price = item.product.discounted_price if item.product.has_discount else item.product.price
                 OrderItem.objects.create(
                     order=order,
                     product=item.product,
-                    price=item.product.price,
+                    price=price,  
                     quantity=item.quantity
                 )
+
+    
+
+            # for item in cart_items:
+            #     OrderItem.objects.create(
+            #         order=order,
+            #         product=item.product,
+            #         price=item.product.price,
+            #         quantity=item.quantity
+            #     )
 
             cart_items.delete()
 
             return redirect('order_complete', order_id=order.id)
 
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    cart_items = CartItem.objects.filter(cart=cart)
-    total = sum(item.product.price * item.quantity for item in cart_items)
-
-    return render(request, 'store/checkout.html', {
-        'cart_items': cart_items,
-        'total': total
-    })
+    return render(request, 'store/checkout.html', context)
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -322,13 +341,16 @@ def razorpay_success(request):
         address = request.POST.get('address')
         phone = request.POST.get('phone')
 
-        print("Received:", payment_id, razorpay_order_id, address, phone)
-
         cart = Cart.objects.get(user=request.user)
         cart_items = CartItem.objects.filter(cart=cart)
-        total = sum(item.product.price * item.quantity for item in cart_items)
+        
+        # Calculate total with discounts - same as cash on delivery
+        total = sum(
+            (item.product.discounted_price if item.product.has_discount else item.product.price) * item.quantity 
+            for item in cart_items
+        )
 
-        # Now create the order
+        # Create order with proper total
         order = Order.objects.create(
             user=request.user,
             address=address,
@@ -338,13 +360,17 @@ def razorpay_success(request):
             razorpay_payment_id=payment_id,
             status='processing'
         )
+
+        # Create order items with correct prices
         for item in cart_items:
+            price = item.product.discounted_price if item.product.has_discount else item.product.price
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
-                price=item.product.price,
+                price=price,  # Use discounted price if available
                 quantity=item.quantity
             )
+
         cart_items.delete()
         messages.success(request, 'Order placed successfully!')
         return JsonResponse({'success': True, 'order_id': order.id})

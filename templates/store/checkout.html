@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 {% block title %}Checkout{% endblock %}
 
+
 {% block content %}
 <div class="container py-5">
     <div class="row">
@@ -70,17 +71,26 @@
                     <div class="d-flex justify-content-between mb-3">
                         <div>
                             <span>{{ item.product.name }}</span>
-                            <small class="d-block text-muted">{{ item.quantity }} x {{ item.product.price }}</small>
+                            {% if item.product.has_discount %}
+                                <div class="d-flex flex-column">
+                                    <small class="d-block text-muted">
+                                        {{ item.quantity }} x ₹{{ item.product.discounted_price }}
+                                        <span class="text-decoration-line-through">₹{{ item.product.price }}</span>
+                                    </small>
+                                    <small class="discount-badge">{{ item.product.discount_percentage }}% OFF</small>
+                                </div>
+                            {% else %}
+                                <small class="d-block text-muted">{{ item.quantity }} x ₹{{ item.product.price }}</small>
+                            {% endif %}
                         </div>
-                        <span>{{ item.total_price }}</span>
+                        <span>₹{{ item.total }}</span>
                     </div>
                     {% endfor %}
                     
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Subtotal:</span>
-
-                        <span class="fw-bold">{{ total }}</span>
+                        <span class="fw-bold">₹{{ subtotal }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Shipping:</span>
@@ -89,7 +99,7 @@
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Total:</span>
-                        <span class="fw-bold price">{{ total }}</span>
+                        <span class="fw-bold price">₹{{ total }}</span>
                     </div>
                 </div>
             </div>

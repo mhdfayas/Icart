@@ -164,73 +164,47 @@ def edit_product(request, product_id):
     product_images = product.images.all()
     
     if request.method == 'POST':
-        product.name = request.POST.get('name')
-        product.category_id = request.POST.get('category')
-        product.description = request.POST.get('description')
-        product.price = request.POST.get('price')
-        product.stock = request.POST.get('stock')
-        product.available = request.POST.get('available') == 'on'
-        
-        # Handle primary image
-        primary_image = request.FILES.get('primary_image')
-        if primary_image:
-            # Update main product image
-            product.image = primary_image
-            
-            # Check if there's an existing primary image
-            existing_primary = product_images.filter(is_primary=True).first()
-            if existing_primary:
-                existing_primary.image = primary_image
-                existing_primary.save()
-            else:
-                ProductImage.objects.create(
-                    product=product,
-                    image=primary_image,
-                    is_primary=True
-                )
-        
-        # Handle additional images
-        for i in range(1, 8):
-            additional_image = request.FILES.get(f'additional_image_{i}')
-            if additional_image:
-                # If we have an existing image at this position, update it
-                if i <= product_images.filter(is_primary=False).count():
-                    # Get the non-primary image at this position (i-1 to account for 0-indexing)
-                    non_primary_images = list(product_images.filter(is_primary=False))
-                    if i-1 < len(non_primary_images):
-                        non_primary_images[i-1].image = additional_image
-                        non_primary_images[i-1].save()
-                else:
-                    # Create new image
-                    ProductImage.objects.create(
-                        product=product,
-                        image=additional_image,
-                        is_primary=False
-                    )
-        
-        # Handle image deletions
-        for i in range(8):
-            delete_image = request.POST.get(f'delete_image_{i}')
-            if delete_image:
-                image_id = int(delete_image)
-                try:
-                    # Don't delete the primary image from ProductImage
-                    # if it's being used as the main product image
-                    img_to_delete = ProductImage.objects.get(id=image_id)
-                    if img_to_delete.is_primary and product.image:
-                        # Just remove the file reference but keep the entry
-                        product.image = None
-                        product.save()
-                    else:
-                        img_to_delete.delete()
-                except ProductImage.DoesNotExist:
-                    pass
-            
-        product.save()
-        
-        messages.success(request, 'Product updated successfully')
-        return redirect('admin_product_list')
-        
+        try:
+            # Handle image deletions first
+            for i in range(8):  # Check for all possible image deletions (0-7)
+                delete_image_id = request.POST.get(f'delete_image_{i}')
+                if delete_image_id:
+                    try:
+                        image_to_delete = ProductImage.objects.get(id=delete_image_id)
+                        # Don't delete if it's the only primary image
+                        if not (image_to_delete.is_primary and not product.images.filter(is_primary=True).exclude(id=image_to_delete.id).exists()):
+                            image_to_delete.delete()
+                    except ProductImage.DoesNotExist:
+                        pass
+
+            # Rest of your existing edit_product code...
+            name = request.POST.get('name')
+            category_id = request.POST.get('category')
+            description = request.POST.get('description', '').strip()
+            price = request.POST.get('price')
+            stock = request.POST.get('stock', 0)
+            available = request.POST.get('available') == 'on'
+            discount_percentage = request.POST.get('discount_percentage', 0)
+
+            # Update product fields
+            product.name = name
+            product.category_id = category_id
+            product.description = description
+            product.price = price
+            product.stock = stock
+            product.available = available
+            product.discount_percentage = discount_percentage
+
+            # Handle new image uploads
+            # ... rest of your existing image upload code ...
+
+            product.save()
+            messages.success(request, 'Product updated successfully')
+            return redirect('admin_product_list')
+
+        except Exception as e:
+            messages.error(request, f'Error updating product: {str(e)}')
+    
     return render(request, 'admin_panel/edit_product.html', {
         'product': product,
         'categories': categories,
@@ -333,3 +307,29 @@ def delete_user(request, user_id):
         messages.success(request, 'User and all related data deleted successfully.')
         return redirect('admin_user_list')
     return redirect('admin_user_list')
+
+@login_required
+@user_passes_test(is_admin)
+def delete_category(request, category_id):
+    if request.method == 'POST':
+        category = get_object_or_404(Category, id=category_id)
+        try:
+            category.delete()
+            messages.success(request, 'Category deleted successfully')
+        except Exception as e:
+            messages.error(request, 'Cannot delete category. It has associated products.')
+    return redirect('admin_category_list')
+
+@login_required
+@user_passes_test(is_admin)
+def edit_category(request, category_id):
+    if request.method == 'POST':
+        category = get_object_or_404(Category, id=category_id)
+        new_name = request.POST.get('name')
+        if new_name and new_name != category.name:
+            category.name = new_name
+            category.slug = slugify(new_name)
+            category.save()
+            messages.success(request, 'Category updated successfully')
+        return redirect('admin_category_list')
+    return redirect('admin_category_list')

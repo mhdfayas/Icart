@@ -23,7 +23,20 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ product.name }}</h5>
                         <p class="text-muted small mb-2">{{ product.category.name }}</p>
-                        <p class="price mb-2">₹{{ product.price }}</p>
+                        
+                        <!-- Updated price display with discount -->
+                        <div class="price-section mb-3">
+                            {% if product.has_discount %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="final-price">₹{{ product.discounted_price }}</span>
+                                    <span class="original-price text-decoration-line-through text-muted">₹{{ product.price }}</span>
+                                    <span class="discount-badge">{{ product.discount_percentage }}% OFF</span>
+                                </div>
+                            {% else %}
+                                <span class="price">₹{{ product.price }}</span>
+                            {% endif %}
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a href="{% url 'product_detail' product.slug %}" 
                                class="btn btn-sm btn-outline-primary">View Details</a>

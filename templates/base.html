@@ -66,7 +66,7 @@
         }
 
         .nav-link {
-            color: rgba(255,255,255,0.9) !important;
+            color: rgba(255,255,255,0.9) ;
             font-weight: 500;
             position: relative;
             transition: all 0.3s ease;
@@ -75,6 +75,27 @@
         .nav-link:hover {
             color: white !important;
             transform: translateY(-2px);
+        }
+        .nav-tabs .nav-link {
+            color: #000000;  /* Black text color */
+            font-weight: 500;
+            padding: 10px 20px;
+            border: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+    
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: #000000;  /* Keep black on hover */
+            background-color: rgba(0,0,0,0.05);  /* Light background on hover */
+        }
+    
+        .nav-tabs .nav-link.active {
+            color: #000000;  /* Keep black when active */
+            border: none;
+            border-bottom: 2px solid #000000;  /* Black bottom border for active tab */
+            background-color: transparent;
         }
 
         /* Update the nav-link hover styles */
@@ -165,7 +186,7 @@
         }
 
         .price {
-            color: var(--red);
+            color: var(--primary);
             font-weight: 600;
         }
 
@@ -410,79 +431,121 @@
         }
 
         /* Remove all existing profile dropdown styles and replace with these */
-.profile-dropdown {
-    min-width: 250px;
-    padding: 0 !important;
-    margin-top: 0.5rem;
-    border: none !important;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    overflow: hidden;
-    background: white;
-}
+        .profile-dropdown {
+            min-width: 250px;
+            padding: 0 !important;
+            margin-top: 0.5rem;
+            border: none !important;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            background: white;
+        }
 
-.profile-header {
-    background: var(--gradient-start);
-    padding: 1rem;
-    text-align: left;
-    margin: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
+        .profile-header {
+            background: var(--gradient-start);
+            padding: 1rem;
+            text-align: left;
+            margin: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-.profile-header h5 {
-    color: white;
-    margin-bottom: 5px;
-    font-size: 1.1rem;
-}
+        .profile-header h5 {
+            color: white;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
 
-.profile-header p {
-    color: rgba(255,255,255,0.8);
-    font-size: 0.9rem;
-    margin: 0;
-}
+        .profile-header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            margin: 0;
+        }
 
-.profile-dropdown .dropdown-item {
-    padding: 0.75rem 1rem;
-    color: var(--text-dark);
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    transition: all 0.2s ease;
-    border-left: 3px solid transparent;
-    margin: 0;
-}
+        .profile-dropdown .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            margin: 0;
+        }
 
-.profile-dropdown .dropdown-item i {
-    width: 20px;
-    margin-right: 10px;
-    font-size: 1rem;
-    color: var(--gradient-start);
-}
+        .profile-dropdown .dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+            font-size: 1rem;
+            color: var(--gradient-start);
+        }
 
-.profile-dropdown .dropdown-item:hover {
-    background: rgba(26,35,126,0.05);
-    border-left: 3px solid var(--gradient-start);
-    padding-left: 1.25rem;
-}
+        .profile-dropdown .dropdown-item:hover {
+            background: rgba(26,35,126,0.05);
+            border-left: 3px solid var(--gradient-start);
+            padding-left: 1.25rem;
+        }
 
-.profile-dropdown .dropdown-divider {
-    margin: 0;
-    opacity: 0.08;
-    border-top: 1px solid rgba(0,0,0,0.1);
-}
+        .profile-dropdown .dropdown-divider {
+            margin: 0;
+            opacity: 0.08;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
 
-.profile-dropdown .dropdown-item.text-danger {
-    color: var(--danger) !important;
-}
+        .profile-dropdown .dropdown-item.text-danger {
+            color: var(--danger) !important;
+        }
 
-.profile-dropdown .dropdown-item.text-danger i {
-    color: var(--danger);
-}
+        .profile-dropdown .dropdown-item.text-danger i {
+            color: var(--danger);
+        }
 
-.profile-dropdown .dropdown-item.text-danger:hover {
-    background: rgba(231,76,60,0.1);
-    border-left-color: var(--danger);
-}
+        .profile-dropdown .dropdown-item.text-danger:hover {
+            background: rgba(231,76,60,0.1);
+            border-left-color: var(--danger);
+        }
+
+        .discount-badge {
+            background-color: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .original-price {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .final-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-tabs .nav-link {
+            color: #000000;  /* Black text color */
+            font-weight: 500;
+            padding: 10px 20px;
+            border: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+    
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: #000000;  /* Keep black on hover */
+            background-color: rgba(0,0,0,0.05);  /* Light background on hover */
+        }
+    
+        .nav-tabs .nav-link.active {
+            color: #000000;  /* Keep black when active */
+            border: none;
+            border-bottom: 2px solid #000000;  /* Black bottom border for active tab */
+            background-color: transparent;
+        }
+
     </style>
     {% block extra_css %}{% endblock %}
 </head>

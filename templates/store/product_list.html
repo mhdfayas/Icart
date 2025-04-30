@@ -1,6 +1,4 @@
-
-
-            {% extends 'base.html' %}
+{% extends 'base.html' %}
 
             {% block title %}
                 {% if category %}{{ category.name }}{% else %}All Products{% endif %} - iCart
@@ -106,18 +104,30 @@
                                                 <div class="card-body">
                                                     <h5 class="card-title">{{ product.name }}</h5>
                                                     <p class="text-muted small mb-2">{{ product.category.name }}</p>
-                                                    <p class="price mb-2">₹{{ product.price }}</p>
-                                                    <div class="d-flex justify-content-between">
-                                                        <a href="{% url 'product_detail' product.slug %}" class="btn btn-sm btn-outline-primary">View Details</a>
-                                                        {% if product.stock > 0 %}
-                                                            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary">
-                                                                <i class="fas fa-cart-plus"></i>
-                                                            </a>
-                                                        {% else %}
-                                                            <button class="btn btn-sm btn-secondary" disabled>
-                                                                <i class="fas fa-times"></i> Out of Stock
-                                                            </button>
-                                                        {% endif %}
+                                                    <div class="product-info">
+                                                        <div class="price-section mb-3">
+                                                            {% if product.has_discount %}
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <span class="final-price">₹{{ product.discounted_price }}</span>
+                                                                    <span class="original-price text-decoration-line-through">₹{{ product.price }}</span>
+                                                                    <span class="discount-badge">{{ product.discount_percentage }}% OFF</span>
+                                                                </div>
+                                                            {% else %}
+                                                                <span class="final-price">₹{{ product.price }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <a href="{% url 'product_detail' product.slug %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                                            {% if product.stock > 0 %}
+                                                                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary">
+                                                                    <i class="fas fa-cart-plus"></i>
+                                                                </a>
+                                                            {% else %}
+                                                                <button class="btn btn-sm btn-secondary" disabled>
+                                                                    <i class="fas fa-times"></i> Out of Stock
+                                                                </button>
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

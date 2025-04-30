@@ -26,27 +26,36 @@
         <h2 class="section-title">Featured Products</h2>
         <div class="row">
             {% for product in products|slice:":4" %}
-    <div class="col-md-3 col-sm-6 mb-4">
-        <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
-            <div class="card h-100 animated-card">
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top" style="height: 280px; object-fit: cover;">
-                {% else %}
-                    <img src="/api/placeholder/300/200" alt="{{ product.name }}" class="card-img-top">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="price mb-2">₹{{ product.price }}</p>
-                    <span class="btn btn-sm btn-outline-primary">View Details</span>
-                </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
+                    <div class="card h-100 animated-card">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top" style="height: 280px; object-fit: cover;">
+                        {% else %}
+                            <img src="/api/placeholder/300/200" alt="{{ product.name }}" class="card-img-top">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <div class="price-section mb-3">
+                                {% if product.has_discount %}
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="final-price">₹{{ product.discounted_price }}</span>
+                                        <span class="original-price text-decoration-line-through">₹{{ product.price }}</span>
+                                        <span class="discount-badge">{{ product.discount_percentage }}% OFF</span>
+                                    </div>
+                                {% else %}
+                                    <span class="final-price">₹{{ product.price }}</span>
+                                {% endif %}
+                            </div>
+                            <span class="btn btn-sm btn-outline-primary">View Details</span>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </a>
-    </div>
-{% empty %}
-   
-                <div class="col-12">
-                    <div class="alert alert-info">No featured products available at the moment.</div>
-                </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">No featured products available at the moment.</div>
+            </div>
             {% endfor %}
         </div>
     </div>

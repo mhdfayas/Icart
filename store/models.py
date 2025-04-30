@@ -1,8 +1,6 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -25,9 +23,22 @@ class Product(models.Model):
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return self.name
+    discount_percentage = models.IntegerField(
+        default=0, 
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        help_text="Discount percentage (0-100)"
+    )
+
+    @property
+    def discounted_price(self):
+        if self.discount_percentage > 0:
+            discount = (self.price * self.discount_percentage) / 100
+            return round(self.price - discount, 2)
+        return self.price
+
+    @property
+    def has_discount(self):
+        return self.discount_percentage > 0
 
 
 class ProductImage(models.Model):
@@ -93,12 +104,8 @@ class OrderItem(models.Model):
         return f"{self.quantity} x {self.product.name}"
 
     @property
-    def total_price(self):
+    def subtotal(self):
         return self.price * self.quantity
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Review(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='reviews')
